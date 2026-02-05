@@ -16,9 +16,15 @@ wheels/
 # Output files
 docs_annotation/output/
 mock_query/queries/
+
+# Dsocs
+docs_annotation/docs/
 docs_annotation/docs/技术文档.md
 docs_annotation/docs/技术文档v2.md
 docs_annotation/docs/需求文档.md
+
+# Reference data
+reference/data/Files/
 reference/data/Files/业务交付管理/【最新3.1】联想百应服务中心合作计划书 12月.pdf
 reference/data/Files/业务交付管理/1-联想百应服务站接单流程.docx
 reference/data/Files/业务交付管理/2-联想百应服务商收费标准.pdf
@@ -148,3 +154,16 @@ reference/data/Files/数据恢复/a7a9cb9408eb4282cbed157d74070e8a.docx
 reference/data/Files/数据恢复/b53c5a1fa7bfdbb3a6f6b356e69aaac0.docx
 reference/data/Files/数据恢复/BYSD线上交付现场运营管理规范.docx
 reference/data/Files/数据恢复/parsing_failed_files.json
+
+# Analysis reports
+analysis/reports/
+analysis/reports/bucket_distribution.csv
+analysis/reports/buckets.json
+analysis/reports/by_folder.json
+analysis/reports/gaps.json
+analysis/reports/high_complexity_docs.csv
+analysis/reports/REPORT.md
+analysis/reports/sampling_advice.json
+analysis/reports/stressor_combos.json
+analysis/reports/summary.json
+analysis/reports/tag_distribution.csv

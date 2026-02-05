@@ -451,6 +451,69 @@ output/
 5. **处理时间**：大量文档处理可能需要较长时间，建议先用 `--use-mock` 测试流程
 6. **增量处理**：默认跳过已标注的文件，使用 `--no-skip-existing` 强制重新处理
 
-## 许可证
+# 使用示例
 
-MIT License
+命令
+```bash
+python batch_annotate.py -v
+```
+
+输出
+```json
+{
+  "doc_id": "【高德建店】规范文档建店SOP手册",
+  "file_type": "pdf",
+  "file_path": "D:\\Project\\Test\\eval\\reference\\data\\Files\\城市运营\\【高德建店】规范文档建店SOP手册.pdf",
+  "doc_profile": {
+    "layout": "single",
+    "has_image": true,
+    "has_table": true,
+    "has_formula": false,
+    "has_chart": true,
+    "image_text_mixed": true,
+    "reading_order_sensitive": true,
+    "table_profile": {
+      "long_table": false,
+      "cross_page_table": false,
+      "table_dominant": false
+    },
+    "chart_profile": {
+      "cross_page_chart": false
+    }
+  }
+}
+```
+## 解读
+```python
+    """
+    文档通用标注Profile（适用于所有文档类型）。
+
+    Attributes:
+        layout: 文档布局类型（single/double/mixed），非PDF默认single
+        has_image: 文档是否包含图片
+        has_table: 文档是否包含表格
+        has_formula: 文档是否包含数学公式
+        has_chart: 文档是否包含图表
+        image_text_mixed: 是否为图文混排（同时包含图片和大量文字）
+        reading_order_sensitive: 阅读顺序是否重要（可选，仅PDF）
+        table_profile: 表格特征Profile（仅PDF，当has_table=True时）
+        chart_profile: 图表特征Profile（仅PDF，当has_chart=True时）
+    """
+
+    """
+    表格特征Profile。
+
+    Attributes:
+        long_table: 是否为长表格（跨3页以上）
+        cross_page_table: 表格是否跨页
+        table_dominant: 表格是否占主导内容（可选）
+    """
+
+    """
+    图表特征Profile。
+
+    Attributes:
+        cross_page_chart: 图表是否跨页
+    """
+
+```

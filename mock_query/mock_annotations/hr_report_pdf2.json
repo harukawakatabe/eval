@@ -1,0 +1,17 @@
+{
+  "doc_id": "hr_report_pdf2",
+  "file_type": "pdf",
+  "file_path": "",
+  "pdf_profile": {
+    "layout": "mixed",
+    "has_image": true,
+    "has_table": false,
+    "has_formula": false,
+    "has_chart": true,
+    "reading_order_sensitive": true,
+    "chart_profile": {
+      "cross_page_chart": true
+    }
+  }
+}
+

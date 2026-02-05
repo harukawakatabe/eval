@@ -1,0 +1,19 @@
+{
+  "doc_id": "hr_policy_pdf1",
+  "file_type": "pdf",
+  "file_path": "",
+  "pdf_profile": {
+    "layout": "single",
+    "has_image": false,
+    "has_table": true,
+    "has_formula": false,
+    "has_chart": false,
+    "reading_order_sensitive": false,
+    "table_profile": {
+      "long_table": false,
+      "cross_page_table": true,
+      "table_dominant": false
+    }
+  }
+}
+

@@ -1,0 +1,150 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# Output files
+docs_annotation/output/
+mock_query/queries/
+docs_annotation/docs/技术文档.md
+docs_annotation/docs/技术文档v2.md
+docs_annotation/docs/需求文档.md
+reference/data/Files/业务交付管理/【最新3.1】联想百应服务中心合作计划书 12月.pdf
+reference/data/Files/业务交付管理/1-联想百应服务站接单流程.docx
+reference/data/Files/业务交付管理/2-联想百应服务商收费标准.pdf
+reference/data/Files/业务交付管理/3-联想百应社区服务站优惠券返还政策.pdf
+reference/data/Files/业务交付管理/5-联想百应《优选服务商红黄线管理规则》2025年第四版1001.pdf
+reference/data/Files/业务交付管理/6-联想百应平台服务商百应分0829.pdf
+reference/data/Files/业务交付管理/8-百应系统服务商接单注意事项.pptx
+reference/data/Files/业务交付管理/9-服务商APP端工单操作重点.pdf
+reference/data/Files/业务交付管理/10-优选服务商拓店时间节点.pdf
+reference/data/Files/业务交付管理/11-优选服务商解约时间节点.pdf
+reference/data/Files/业务交付管理/12月百应分结果及大区排名.docx
+reference/data/Files/业务交付管理/13-B级服务商续约后期改善方案与目标确认书.pdf
+reference/data/Files/业务交付管理/14-C级服务商续约后期改善方案与目标确认书.pdf
+reference/data/Files/业务交付管理/15-改善方案与目标确认书填写建议.docx
+reference/data/Files/业务交付管理/16-百应学院快速使用指南（内部员工版）20251105 V2.0.pdf
+reference/data/Files/业务交付管理/17-百应学院快速使用指南（社区商版）20251105 V2.0(1).pdf
+reference/data/Files/业务交付管理/第二季度百应分排名.docx
+reference/data/Files/业务交付管理/店铺服务站ID+店铺ID0108.docx
+reference/data/Files/业务交付管理/联想百应城市服务商发送照片规则.pdf
+reference/data/Files/业务交付管理/联想百应合作及赋能 12月.pdf
+reference/data/Files/业务交付管理/联想百应介绍.pdf
+reference/data/Files/业务交付管理/商家替付款证明线上操作说明_商家版.docx
+reference/data/Files/业务交付管理/替付款证明提交流程图1211.pdf
+reference/data/Files/业务交付管理/SMB 强参与门店名单1.13.docx
+reference/data/Files/供应商管理部/①充值.png
+reference/data/Files/供应商管理部/②支付.png
+reference/data/Files/供应商管理部/③提现.png
+reference/data/Files/供应商管理部/服务商APP客户发票申请流程(1).pdf
+reference/data/Files/供应商管理部/供应链赋能学习材料.pdf
+reference/data/Files/供应商管理部/供应链新模式.pdf
+reference/data/Files/供应商管理部/联想百应采购支付方式.png
+reference/data/Files/供应商管理部/联想百应平台采购商家代客下单操作手册.pdf
+reference/data/Files/供应商管理部/联想百应平台多品牌维修备件&二级维修业务介绍20250930.pdf
+reference/data/Files/供应商管理部/维修备件&二级维修商按区域推广宣传页251028.pptx
+reference/data/Files/供应商管理部/优惠券查看.jpg
+reference/data/Files/供应商管理部/B2B_Operation_Manual_北京银行.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_华夏银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_汇丰银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_交通银行支付手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_平安银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_青岛银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_上海浦东发展银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_兴业银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_招商银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国工商银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国光大银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国广发银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国建设银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国民生银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国农业银行支付手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国银行操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中国邮政储蓄银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_中心银行支付操作手册.pdf
+reference/data/Files/供应商管理部/B2B_Operation_Manual_BON.pdf
+reference/data/Files/供应商管理部/BYO平台产品基础培训.pptx
+reference/data/Files/供应商管理部/BYO平台服务商APP操作手册.pptx
+reference/data/Files/供应商管理部/BYO平台服务商APP操作手册20230920(2).pptx
+reference/data/Files/供应商管理部/BYO平台服务商APP信用金账期下单操作手册20230704(1).pdf
+reference/data/Files/供应商管理部/BYO平台进销存系统下单操作手册.pptx
+reference/data/Files/供应商管理部/FY25 选备件优质供应商推荐.pdf
+reference/data/Files/供应商管理部/parsing_failed_files.json
+reference/data/Files/城市运营/【高德建店】规范文档建店SOP手册.pdf
+reference/data/Files/城市运营/01-联想百应优选服务商店面合作申请表-更新2.13.xlsx
+reference/data/Files/城市运营/02-联想百应优选服务商店面合作申请表-WTY融合店.xlsx
+reference/data/Files/城市运营/2-优选服务商拓展计划-CS手册(更新)3.26.xlsx
+reference/data/Files/城市运营/3-新店任务-美团开店宝后台介绍.pdf
+reference/data/Files/城市运营/4-开业准备-门店美团优惠码下载并制作台卡.pdf
+reference/data/Files/城市运营/4-装修完成验收申请表-更新3.24.xlsx
+reference/data/Files/城市运营/8-新店任务-美团订单核销流程&退款流程.pdf
+reference/data/Files/城市运营/22-联想百应服务商门店评审&验收操作指南-2024年8月发布版.pdf
+reference/data/Files/城市运营/22-联想百应服务商门店评审&验收操作指南-2024年8月发布版(1).pdf
+reference/data/Files/城市运营/附件2.新建门店登录、绑定银行卡SOP.pdf
+reference/data/Files/城市运营/高德1月投流政策.pdf
+reference/data/Files/城市运营/高德建店-资质被占用处理办法.pdf
+reference/data/Files/城市运营/高德商家分宣贯4.23.pdf
+reference/data/Files/城市运营/联想百应城市服务商拓展收费及赋能3.26.xlsx
+reference/data/Files/城市运营/联想百应区域距离保护政策.png
+reference/data/Files/城市运营/美团投流活动激励方案-2026年1月.pdf
+reference/data/Files/城市运营/parsing_failed_files.json
+reference/data/Files/客户运营部/服务商店铺设计规范-2025.V2.pdf
+reference/data/Files/客户运营部/联想百应服务中心门店设计规范执行说明.docx
+reference/data/Files/客户运营部/门店首次回复时长提升动作.pdf
+reference/data/Files/客户运营部/企微加好友配置说明.pdf
+reference/data/Files/客户运营部/商家到店客户、上门客户、电话咨询加好友流程V1.1 (1).pdf
+reference/data/Files/客户运营部/商家到店客户、上门客户、电话咨询加好友流程V1.1.pdf
+reference/data/Files/客户运营部/商家激活企微&SCRM操作指引.pdf
+reference/data/Files/客户运营部/商家企微发圈操作指引 (1).pdf
+reference/data/Files/客户运营部/商家企微发圈操作指引.pdf
+reference/data/Files/客户运营部/社区服务站私域经营方案.pdf
+reference/data/Files/客户运营部/私域小店产品上架及核销流程.pdf
+reference/data/Files/客户运营部/私域小店一元购活动操作流程.pdf
+reference/data/Files/客户运营部/新店抽奖活动商家指引 (1).pdf
+reference/data/Files/客户运营部/新店抽奖活动商家指引.pdf
+reference/data/Files/手机业务/百应电池维修介绍及培训.pdf
+reference/data/Files/手机业务/百应手机贴膜服务SOP及贴膜教程.pdf
+reference/data/Files/手机业务/百应手机维修服务标准+到店SOP.pdf
+reference/data/Files/数据恢复/01-百应智能体介绍-v2.5 简易版.pptx
+reference/data/Files/数据恢复/1、智商务-有店商常用操作手册-202302.pdf
+reference/data/Files/数据恢复/01.联想百应智能体一页纸介绍-v2.docx
+reference/data/Files/数据恢复/1.docx
+reference/data/Files/数据恢复/2.docx
+reference/data/Files/数据恢复/3.docx
+reference/data/Files/数据恢复/4.docx
+reference/data/Files/数据恢复/5.docx
+reference/data/Files/数据恢复/6.docx
+reference/data/Files/数据恢复/7.docx
+reference/data/Files/数据恢复/8.docx
+reference/data/Files/数据恢复/9.docx
+reference/data/Files/数据恢复/9c2c0379fafbb755517d02f77b1c871c.docx
+reference/data/Files/数据恢复/9ec49ae1a24ee8bac7cc37e2d13b030a.docx
+reference/data/Files/数据恢复/10.docx
+reference/data/Files/数据恢复/51cfd68b48e2c5180155d14177ee742a.docx
+reference/data/Files/数据恢复/51d662364fb1c737a1c22e89a2af9e41.docx
+reference/data/Files/数据恢复/320cd258d94df2d69d758dd3e4fbbf78.docx
+reference/data/Files/数据恢复/20200720沟通技巧-投诉.pptx
+reference/data/Files/数据恢复/报价单_模板.docx
+reference/data/Files/数据恢复/北京移动项目培训.pptx
+reference/data/Files/数据恢复/打印机知识培训（20200731）.pptx
+reference/data/Files/数据恢复/服务云工单系统派单步骤.docx
+reference/data/Files/数据恢复/魔方系统主要功能展示 .docx
+reference/data/Files/数据恢复/逆向逻辑.xlsx
+reference/data/Files/数据恢复/逆向物流监控1031.docx
+reference/data/Files/数据恢复/三包政策以及扬天产品保修.pptx
+reference/data/Files/数据恢复/数据恢复沟通技巧提升.docx
+reference/data/Files/数据恢复/数据恢复介绍及培训.pdf
+reference/data/Files/数据恢复/a7a9cb9408eb4282cbed157d74070e8a.docx
+reference/data/Files/数据恢复/b53c5a1fa7bfdbb3a6f6b356e69aaac0.docx
+reference/data/Files/数据恢复/BYSD线上交付现场运营管理规范.docx
+reference/data/Files/数据恢复/parsing_failed_files.json

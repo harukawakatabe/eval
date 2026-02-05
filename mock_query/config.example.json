@@ -1,0 +1,35 @@
+{
+  "domain": "hr",
+  "seed": 20260204,
+  "per_file_type": 50,
+  "queries_per_doc": 2,
+  "allow_sample_with_replacement": true,
+  "balance_keys": {
+    "level1": "file_type",
+    "pdf_stressors": [
+      "layout",
+      "has_image",
+      "has_table",
+      "has_formula",
+      "has_chart",
+      "reading_order_sensitive",
+      "table_profile.long_table",
+      "table_profile.cross_page_table",
+      "table_profile.table_dominant",
+      "chart_profile.cross_page_chart"
+    ]
+  },
+  "behavior_mix": {
+    "answer": 0.75,
+    "partial": 0.10,
+    "refuse": 0.10,
+    "ask_clarification": 0.05
+  },
+  "paths": {
+    "annotations_dir": "docs_annotation/output",
+    "docs_dir": "",
+    "out_dir": "mock_query/queries",
+    "templates_path": "mock_query/templates_hr.json"
+  }
+}
+

@@ -1,7 +1,7 @@
 """处理管道 - 顺序连接多个处理器。"""
 
 from typing import Any, List, Optional
-from core.base import BaseProcessor, ProcessResult
+from .base import BaseProcessor, ProcessResult
 
 
 class Pipeline:

@@ -17,11 +17,13 @@ docs_annotation/
 ├── src/
 │   ├── core/              # 核心框架
 │   │   ├── base.py        # 基类定义
+│   │   ├── logger.py      # 日志模块
 │   │   ├── pipeline.py    # 处理管道
 │   │   └── schema.py      # Schema定义
 │   │
 │   ├── processors/        # 处理器模块
-│   │   ├── doc_parser.py      # 文档解析器
+│   │   ├── doc_parser.py      # 文档解析器（Legacy）
+│   │   ├── docling_parser.py  # Docling高精度解析器
 │   │   ├── element_detector.py # 元素检测
 │   │   ├── feature_extractor.py # 特征提取
 │   │   └── layout_classifier.py # 布局分类
@@ -36,12 +38,17 @@ docs_annotation/
 │   └── processors.yaml    # 处理器配置
 │
 ├── docs/                  # 文档目录
-│   ├── 需求文档.md
-│   ├── 技术文档.md
-│   └── 技术文档v2.md
 │
-├── output/                # 输出目录
+├── test/                  # 测试目录
+│   ├── run_all_tests.py       # 运行所有测试
+│   ├── test_table_detection.py
+│   ├── test_chart_detection.py
+│   ├── test_cross_page_table.py
+│   └── test_parser_comparison.py
+│
+├── output/                # 输出目录（运行时生成）
 ├── main.py                # 使用示例
+├── test_one.py            # 单文件测试脚本
 ├── batch_annotate.py      # 批量处理脚本
 └── requirements.txt       # 依赖列表
 ```
@@ -143,6 +150,12 @@ python batch_annotate.py --input ../reference/data/Files --output ./output
 
 # 重新处理所有文件（不跳过已标注的）
 python batch_annotate.py --no-skip-existing
+
+# 使用轻量级解析器（不需要 Docling/GPU，速度快）
+python batch_annotate.py --parser legacy
+
+# 组合使用：轻量解析器 + Mock 模型 + 详细输出
+python batch_annotate.py --parser legacy --use-mock -v
 ```
 
 **功能特性：**
@@ -159,6 +172,9 @@ python batch_annotate.py --no-skip-existing
 ### 1. 使用Mock模型（无需API）
 
 ```python
+import sys
+sys.path.insert(0, "src")  # 添加src目录到路径
+
 from service import AnnotationService
 from models.ocr import MockOCR
 from models.llm import MockLLM
@@ -175,7 +191,10 @@ print(annotation.to_json())
 ### 2. 使用PaddleOCR + OpenAI
 
 ```python
+import sys
 import os
+sys.path.insert(0, "src")
+
 from service import AnnotationService
 from models.ocr import PaddleOCRModel
 from models.llm import OpenAILLM
@@ -198,7 +217,12 @@ service.save_annotation(annotation, "output/result.json")
 ### 3. 使用配置文件
 
 ```python
+import sys
+sys.path.insert(0, "src")
+
 from service import AnnotationService
+from models.ocr import PaddleOCRModel
+from models.llm import OpenAILLM
 
 # 加载配置
 config = AnnotationService.load_config("config/processors.yaml")
@@ -209,6 +233,22 @@ service = AnnotationService(
     llm_model=OpenAILLM(api_key="..."),
     config=config.get("processors", {})
 )
+```
+
+### 4. 使用单文件测试脚本
+
+```bash
+# 基本使用
+python test_one.py document.pdf
+
+# 详细日志模式
+python test_one.py document.pdf -v
+
+# 指定解析器（auto/docling/legacy）
+python test_one.py document.pdf --parser docling
+
+# 静默模式
+python test_one.py document.pdf -q
 ```
 
 ## 标注结果格式
@@ -225,6 +265,8 @@ service = AnnotationService(
     "layout": "single",
     "has_image": true,
     "has_table": true,
+    "has_image_table": false,
+    "has_complex_table": true,
     "has_formula": false,
     "has_chart": false,
     "image_text_mixed": true,
@@ -251,6 +293,8 @@ service = AnnotationService(
     "layout": "single",
     "has_image": true,
     "has_table": true,
+    "has_image_table": false,
+    "has_complex_table": false,
     "has_formula": false,
     "has_chart": false,
     "image_text_mixed": true
@@ -259,6 +303,18 @@ service = AnnotationService(
 ```
 
 > **说明**：`table_profile` 和 `chart_profile` 仅对 PDF 输出，因为跨页概念只对 PDF 有意义。
+
+### 表格字段说明（RAG 场景）
+
+| 字段 | 含义 | RAG 影响 |
+|------|------|---------|
+| `has_table` | 是否有**可被结构化解析**的表格 | 能正常 chunk 和问答 |
+| `has_image_table` | 是否有**图片形式**的表格（扫描版/截图） | 需要 OCR，结构可能丢失，chunking 时可能变成图片或纯文字 |
+| `has_complex_table` | 是否有**复杂表格**（>10列 / >100行 / 宽表格） | 即使解析也难在 chunk 中保持格式，问答可能不准确 |
+
+**判断标准：**
+- `has_image_table = True`：检测到大图片但没有对应的结构化表格
+- `has_complex_table = True`：列数 > 10，或行数 > 100，或列数 ≥ 7 且行数 > 20
 
 ### 各文件类型元素检测方式
 
@@ -300,19 +356,39 @@ python batch_annotate.py [OPTIONS]
   --output PATH           输出结果目录（默认: ./output）
   --use-mock             使用 Mock 模型（用于测试流程）
   --no-skip-existing     不跳过已标注的文件（重新处理所有文件）
+  --parser TYPE          解析器类型: auto, docling, legacy（默认: auto）
   -v, --verbose          显示每个文件的处理详情（默认只显示进度条）
   -h, --help             显示帮助信息
+```
+
+### 解析器选项说明
+
+| 选项 | 说明 | 适用场景 |
+|------|------|---------|
+| `auto` | 自动选择（优先 Docling） | 默认选项，自动适配 |
+| `docling` | 强制使用 Docling | 需要高精度解析，有 GPU 加速 |
+| `legacy` | 使用 pdfplumber/python-docx | 轻量快速，不需要 GPU |
+
+```bash
+# 使用 legacy 解析器（快速，不需要 Docling/GPU）
+python batch_annotate.py --parser legacy
+
+# 使用 legacy + Mock 模型测试
+python batch_annotate.py --parser legacy --use-mock
+
+# 使用 legacy + 详细输出
+python batch_annotate.py --parser legacy -v
 ```
 
 ## 不使用脚本的方法
 
 如果你不想使用 `batch_annotate.py`，可以直接调用 `AnnotationService`：
 
-### 方法一：Python 代码调用
+### 方法一：Python 代码调用（在 docs_annotation 目录下）
 
 ```python
 import sys
-sys.path.insert(0, "docs_annotation/src")
+sys.path.insert(0, "src")
 
 from service import AnnotationService
 from models.ocr import MockOCR  # 或 PaddleOCRModel
@@ -338,12 +414,26 @@ for file_path in Path("documents").rglob("*.docx"):
     service.save_annotation(ann, f"output/{file_path.stem}.json")
 ```
 
-### 方法二：使用 uv run 一行命令
+### 方法二：从外部目录调用
+
+```python
+import sys
+sys.path.insert(0, "docs_annotation/src")
+
+from service import AnnotationService
+from models.ocr import MockOCR
+from models.llm import MockLLM
+
+service = AnnotationService(ocr_model=MockOCR(), llm_model=MockLLM())
+print(service.annotate("path/to/document.docx").to_json())
+```
+
+### 方法三：使用 uv run 一行命令
 
 ```bash
-# 单文件标注（输出到控制台）
+# 单文件标注（在 docs_annotation 目录下执行）
 uv run python -c "
-import sys; sys.path.insert(0, 'docs_annotation/src')
+import sys; sys.path.insert(0, 'src')
 from service import AnnotationService
 from models.ocr import MockOCR
 from models.llm import MockLLM
@@ -418,6 +508,10 @@ python batch_annotate.py
 ### 单文件处理示例
 
 ```bash
+# 使用 test_one.py（推荐）
+python test_one.py document.pdf -v
+
+# 或使用 main.py 查看使用示例
 python main.py
 ```
 
@@ -468,6 +562,8 @@ python batch_annotate.py -v
     "layout": "single",
     "has_image": true,
     "has_table": true,
+    "has_image_table": true,
+    "has_complex_table": false,
     "has_formula": false,
     "has_chart": true,
     "image_text_mixed": true,
@@ -483,37 +579,46 @@ python batch_annotate.py -v
   }
 }
 ```
-## 解读
-```python
-    """
-    文档通用标注Profile（适用于所有文档类型）。
 
-    Attributes:
-        layout: 文档布局类型（single/double/mixed），非PDF默认single
-        has_image: 文档是否包含图片
-        has_table: 文档是否包含表格
-        has_formula: 文档是否包含数学公式
-        has_chart: 文档是否包含图表
-        image_text_mixed: 是否为图文混排（同时包含图片和大量文字）
-        reading_order_sensitive: 阅读顺序是否重要（可选，仅PDF）
-        table_profile: 表格特征Profile（仅PDF，当has_table=True时）
-        chart_profile: 图表特征Profile（仅PDF，当has_chart=True时）
-    """
+## 字段解读
 
-    """
-    表格特征Profile。
+### 文档通用标注 Profile
 
-    Attributes:
-        long_table: 是否为长表格（跨3页以上）
-        cross_page_table: 表格是否跨页
-        table_dominant: 表格是否占主导内容（可选）
-    """
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `layout` | string | 文档布局类型：`single`（单页）/ `double`（双页）/ `mixed`（混合） |
+| `has_image` | bool | 文档是否包含图片 |
+| `has_table` | bool | 是否有**可被结构化解析**的表格（能正常 chunk） |
+| `has_image_table` | bool | 是否有**图片形式**的表格（扫描版/截图，chunking 时可能丢失或变成图片） |
+| `has_complex_table` | bool | 是否有**复杂表格**（列数多/行数多，chunk 中难以保持格式） |
+| `has_formula` | bool | 文档是否包含数学公式 |
+| `has_chart` | bool | 文档是否包含图表 |
+| `image_text_mixed` | bool | 是否为图文混排（同时包含图片和大量文字） |
+| `reading_order_sensitive` | bool | 阅读顺序是否重要（可选，仅 PDF） |
+| `table_profile` | object | 表格特征 Profile（仅 PDF，当 `has_table=True` 时） |
+| `chart_profile` | object | 图表特征 Profile（仅 PDF，当 `has_chart=True` 时） |
 
-    """
-    图表特征Profile。
+### 表格特征 Profile
 
-    Attributes:
-        cross_page_chart: 图表是否跨页
-    """
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `long_table` | bool | 是否为长表格（跨 3 页以上） |
+| `cross_page_table` | bool | 表格是否跨页 |
+| `table_dominant` | bool | 表格是否占主导内容（可选） |
 
-```
+### 图表特征 Profile
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `cross_page_chart` | bool | 图表是否跨页 |
+
+### RAG 场景使用建议
+
+根据表格字段组合，可以判断文档的解析难度：
+
+| 组合 | 解析难度 | 建议处理方式 |
+|------|---------|-------------|
+| `has_table=true`, 其他 false | 低 | 直接使用结构化解析 |
+| `has_image_table=true` | 中 | 需要 OCR + 表格识别，或使用 Docling |
+| `has_complex_table=true` | 高 | 考虑特殊 chunk 策略，或提示用户表格可能不完整 |
+| 两者都为 true | 高 | 建议人工审核或使用专业表格提取工具 |

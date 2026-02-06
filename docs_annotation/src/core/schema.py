@@ -17,6 +17,22 @@ class FileType(str, Enum):
     MD = "md"
 
 
+# 文件扩展名到 FileType 的映射（公共常量）
+EXT_TO_FILE_TYPE: Dict[str, "FileType"] = {
+    ".pdf": FileType.PDF,
+    ".doc": FileType.DOC,
+    ".docx": FileType.DOC,
+    ".xls": FileType.EXCEL,
+    ".xlsx": FileType.EXCEL,
+    ".ppt": FileType.PPT,
+    ".pptx": FileType.PPT,
+    ".html": FileType.HTML,
+    ".htm": FileType.HTML,
+    ".txt": FileType.TXT,
+    ".md": FileType.MD,
+}
+
+
 class LayoutType(str, Enum):
     """文档布局类型。"""
 
@@ -75,7 +91,9 @@ class DocProfile:
     Attributes:
         layout: 文档布局类型（single/double/mixed），非PDF默认single
         has_image: 文档是否包含图片
-        has_table: 文档是否包含表格
+        has_table: 文档是否包含可被结构化解析的表格
+        has_image_table: 文档是否包含图片形式的表格（扫描版/截图，无法结构化解析）
+        has_complex_table: 文档是否包含复杂表格（多级表头/大量合并单元格）
         has_formula: 文档是否包含数学公式
         has_chart: 文档是否包含图表
         image_text_mixed: 是否为图文混排（同时包含图片和大量文字）
@@ -87,6 +105,8 @@ class DocProfile:
     layout: LayoutType = LayoutType.SINGLE
     has_image: bool = False
     has_table: bool = False
+    has_image_table: bool = False
+    has_complex_table: bool = False
     has_formula: bool = False
     has_chart: bool = False
     image_text_mixed: bool = False
@@ -100,6 +120,8 @@ class DocProfile:
             "layout": self.layout.value,
             "has_image": self.has_image,
             "has_table": self.has_table,
+            "has_image_table": self.has_image_table,
+            "has_complex_table": self.has_complex_table,
             "has_formula": self.has_formula,
             "has_chart": self.has_chart,
             "image_text_mixed": self.image_text_mixed,

@@ -7,6 +7,7 @@
     python batch_annotate.py
     python batch_annotate.py --input ../reference/data/Files --output ./output
     python batch_annotate.py --use-mock  # 使用Mock模型测试
+    python batch_annotate.py --parser legacy  # 使用轻量级解析器（不需要Docling/GPU）
 """
 
 import sys
@@ -17,9 +18,6 @@ import io
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-
-# 添加src目录到路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 # 加载环境变量
 from dotenv import load_dotenv
@@ -32,8 +30,10 @@ from typing import List, Set, Dict, Any
 from datetime import datetime
 
 from src.service import AnnotationService
+from src.processors.doc_parser import ParserBackend
 from src.models.ocr import PaddleOCRModel, MockOCR
 from src.models.llm import OpenAILLM, MockLLM
+from src.core.logger import get_logger
 
 
 # 支持的文件扩展名
@@ -49,6 +49,7 @@ class BatchAnnotator:
         output_dir: Path,
         use_mock: bool = False,
         skip_existing: bool = True,
+        parser_backend: ParserBackend = ParserBackend.AUTO,
     ):
         """
         初始化批量标注器。
@@ -58,10 +59,12 @@ class BatchAnnotator:
             output_dir: 输出结果目录
             use_mock: 是否使用Mock模型（用于测试）
             skip_existing: 是否跳过已标注的文件
+            parser_backend: 解析器后端（AUTO/DOCLING/LEGACY）
         """
         self.input_dir = input_dir
         self.output_dir = output_dir
         self.skip_existing = skip_existing
+        self.parser_backend = parser_backend
 
         # 初始化服务
         if use_mock:
@@ -69,6 +72,7 @@ class BatchAnnotator:
             self.service = AnnotationService(
                 ocr_model=MockOCR(),
                 llm_model=MockLLM(),
+                parser_backend=parser_backend,
             )
         else:
             # 使用真实模型
@@ -102,6 +106,7 @@ class BatchAnnotator:
             self.service = AnnotationService(
                 ocr_model=ocr_model,
                 llm_model=llm_model,
+                parser_backend=parser_backend,
             )
 
         # 统计信息
@@ -349,6 +354,19 @@ def main():
         help="显示每个文件的处理详情（默认只显示进度条）",
     )
 
+    parser.add_argument(
+        "--parser",
+        choices=["auto", "docling", "legacy"],
+        default="auto",
+        help="解析器类型: auto, docling, legacy（默认: auto）",
+    )
+
+    parser.add_argument(
+        "--log-to-file",
+        action="store_true",
+        help="将日志保存到 docs_annotation/logs 目录",
+    )
+
     args = parser.parse_args()
 
     # 转换为绝对路径
@@ -360,12 +378,28 @@ def main():
         print(f"错误: 输入目录不存在: {input_dir}")
         sys.exit(1)
 
+    # 解析器类型映射
+    parser_map = {
+        "auto": ParserBackend.AUTO,
+        "docling": ParserBackend.DOCLING,
+        "legacy": ParserBackend.LEGACY,
+    }
+    parser_backend = parser_map[args.parser]
+
+    # 初始化日志系统（如果启用了日志落盘）
+    if args.log_to_file:
+        import logging
+        log_dir = Path(__file__).parent / "logs"
+        get_logger(level=logging.INFO, log_to_file=True, log_dir=log_dir)
+        print(f"日志将保存到: {log_dir}")
+
     # 创建批量标注器并运行
     annotator = BatchAnnotator(
         input_dir=input_dir,
         output_dir=output_dir,
         use_mock=args.use_mock,
         skip_existing=not args.no_skip_existing,
+        parser_backend=parser_backend,
     )
 
     annotator.run(verbose=args.verbose)

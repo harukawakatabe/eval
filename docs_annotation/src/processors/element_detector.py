@@ -3,8 +3,9 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from core.base import BaseProcessor, ProcessResult
-from models.ocr import OCRModel
+from ..core.base import BaseProcessor, ProcessResult
+from ..core.logger import get_logger
+from ..models.ocr import OCRModel
 from .doc_parser import DocContent
 
 
@@ -71,6 +72,7 @@ class ElementDetector(BaseProcessor):
         self.ocr_model: Optional[OCRModel] = config.get("ocr_model") if config else None
         self.enabled_detectors = self.config.get("enabled_detectors", ["image", "table", "formula", "chart"])
         self.confidence_threshold = self.config.get("confidence_threshold", 0.5)
+        self.logger = get_logger()
 
     def process(self, input_data: DocContent) -> ProcessResult:
         """
@@ -82,7 +84,7 @@ class ElementDetector(BaseProcessor):
         Returns:
             ProcessResult，包含更新后的DocContent和ElementList
         """
-        from core.schema import FileType
+        from ..core.schema import FileType
 
         elements = ElementList()
 
@@ -113,31 +115,58 @@ class ElementDetector(BaseProcessor):
         从 metadata 读取结构化元素信息（用于非 PDF 文档）。
 
         docx/pptx/xlsx 的元素信息由 DocParser 在解析时提取到 metadata 中。
+        现在支持使用 tables_detail 等详细信息，包含正确的页码。
         """
         metadata = input_data.metadata or {}
 
-        # 根据 metadata 中的标志创建虚拟元素（用于后续判断 has_* 字段）
-        if metadata.get("has_image", False):
-            # 添加一个虚拟元素表示存在图片
-            count = metadata.get("image_count", 1)
-            for i in range(min(count, 1)):  # 至少添加一个表示存在
-                elements.images.append(ElementInfo(
-                    bbox=[0, 0, 0, 0],
-                    page=0,
+        # === 处理表格（优先使用 tables_detail）===
+        tables_detail = metadata.get("tables_detail", [])
+        if tables_detail:
+            for tbl in tables_detail:
+                elements.tables.append(ElementInfo(
+                    bbox=tbl.get("bbox", [0, 0, 0, 0]) or [0, 0, 0, 0],
+                    page=tbl.get("page", 0) or 0,
                     confidence=1.0,
-                    extra={"source": "metadata"}
+                    extra={
+                        "source": "metadata",
+                        "rows": tbl.get("rows", 0),
+                        "cols": tbl.get("cols", 0),
+                    }
                 ))
-
-        if metadata.get("has_table", False):
+        elif metadata.get("has_table", False):
+            # 回退：使用 table_pages 或创建虚拟元素
+            table_pages = metadata.get("table_pages", [0])
             count = metadata.get("table_count", 1)
-            for i in range(min(count, 1)):
+            for i, page in enumerate(table_pages[:count]):
                 elements.tables.append(ElementInfo(
                     bbox=[0, 0, 0, 0],
-                    page=0,
+                    page=page,
                     confidence=1.0,
                     extra={"source": "metadata"}
                 ))
 
+        # === 处理图片（使用 images_detail 或 image_pages）===
+        images_detail = metadata.get("images_detail", [])
+        if images_detail:
+            for img in images_detail:
+                elements.images.append(ElementInfo(
+                    bbox=img.get("bbox", [0, 0, 0, 0]) or [0, 0, 0, 0],
+                    page=img.get("page", 0) or 0,
+                    confidence=1.0,
+                    extra={"source": "metadata"}
+                ))
+        elif metadata.get("has_image", False):
+            image_pages = metadata.get("image_pages", [0])
+            count = metadata.get("image_count", 1)
+            for i, page in enumerate(image_pages[:count]):
+                elements.images.append(ElementInfo(
+                    bbox=[0, 0, 0, 0],
+                    page=page,
+                    confidence=1.0,
+                    extra={"source": "metadata"}
+                ))
+
+        # === 处理公式 ===
         if metadata.get("has_formula", False):
             elements.formulas.append(ElementInfo(
                 bbox=[0, 0, 0, 0],
@@ -146,15 +175,18 @@ class ElementDetector(BaseProcessor):
                 extra={"source": "metadata"}
             ))
 
+        # === 处理图表 ===
         if metadata.get("has_chart", False):
             count = metadata.get("chart_count", 1)
-            for i in range(min(count, 1)):
+            for i in range(count):
                 elements.charts.append(ElementInfo(
                     bbox=[0, 0, 0, 0],
                     page=0,
                     confidence=1.0,
                     extra={"source": "metadata"}
                 ))
+
+        self.logger.debug(f"从 metadata 提取元素: 图片={len(elements.images)}, 表格={len(elements.tables)}, 公式={len(elements.formulas)}, 图表={len(elements.charts)}")
 
         return ProcessResult(
             success=True,
@@ -174,16 +206,25 @@ class ElementDetector(BaseProcessor):
         """
         # 如果没有OCR模型，返回空结果
         if self.ocr_model is None:
+            self.logger.ocr_skip("未提供 OCR 模型")
             return ProcessResult(
                 success=True,
                 data=(input_data, ElementList()),
                 metadata={"warning": "No OCR model provided, skipping element detection"}
             )
 
+        self.logger.info(f"使用 OCR 检测 {len(input_data.pages)} 页")
+
         # 遍历每一页进行检测
         for page_idx, page_image in enumerate(input_data.pages):
             try:
+                # 记录 OCR 开始
+                self.logger.ocr_start(page_idx, image_size=(len(page_image),) if page_image else None)
+                
                 detected = self.ocr_model.detect_elements(page_image)
+                
+                # 记录 OCR 结果
+                self.logger.ocr_result(page_idx, detected)
 
                 # 处理检测结果
                 if "image" in self.enabled_detectors:
@@ -226,11 +267,12 @@ class ElementDetector(BaseProcessor):
                             ))
 
             except Exception as e:
-                # 单页检测失败不中断整体流程
-                return ProcessResult(
-                    success=False,
-                    errors=[f"Error detecting elements on page {page_idx}: {str(e)}"]
-                )
+                # 单页检测失败记录错误但继续
+                self.logger.ocr_error(page_idx, str(e))
+                # 不中断整体流程，继续处理下一页
+                continue
+
+        self.logger.debug(f"OCR 完成: 图片={len(elements.images)}, 表格={len(elements.tables)}, 公式={len(elements.formulas)}, 图表={len(elements.charts)}")
 
         return ProcessResult(
             success=True,

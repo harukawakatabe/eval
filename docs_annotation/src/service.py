@@ -1,16 +1,19 @@
 """文档标注服务 - 统一入口。"""
 
+import logging
+import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from core.pipeline import Pipeline
-from core.schema import DocumentAnnotation
-from processors.doc_parser import DocParser
-from processors.element_detector import ElementDetector
-from processors.feature_extractor import FeatureExtractor
-from processors.layout_classifier import LayoutClassifier
-from models.ocr import OCRModel
-from models.llm import LLMModel
+from .core.pipeline import Pipeline
+from .core.schema import DocumentAnnotation
+from .core.logger import get_logger, set_log_level
+from .processors.doc_parser import DocParser, ParserBackend, create_parser
+from .processors.element_detector import ElementDetector
+from .processors.feature_extractor import FeatureExtractor
+from .processors.layout_classifier import LayoutClassifier
+from .models.ocr import OCRModel
+from .models.llm import LLMModel
 
 
 class AnnotationService:
@@ -22,7 +25,8 @@ class AnnotationService:
     使用示例：
         service = AnnotationService(
             ocr_model=PaddleOCRModel(),
-            llm_model=OpenAILLM(api_key="...")
+            llm_model=OpenAILLM(api_key="..."),
+            parser_backend=ParserBackend.AUTO  # 或 DOCLING, LEGACY
         )
         annotation = service.annotate("document.pdf")
     """
@@ -32,6 +36,8 @@ class AnnotationService:
         ocr_model: Optional[OCRModel] = None,
         llm_model: Optional[LLMModel] = None,
         config: Optional[Dict[str, Any]] = None,
+        parser_backend: ParserBackend = ParserBackend.AUTO,
+        log_level: int = logging.INFO,
     ):
         """
         初始化标注服务。
@@ -40,10 +46,15 @@ class AnnotationService:
             ocr_model: OCR模型实例（用于元素检测）
             llm_model: LLM模型实例（用于特征提取和布局分类）
             config: 全局配置字典
+            parser_backend: 解析器后端（AUTO/DOCLING/LEGACY）
+            log_level: 日志级别（logging.DEBUG/INFO/WARNING等）
         """
         self.ocr_model = ocr_model
         self.llm_model = llm_model
         self.config = config or {}
+        self.parser_backend = parser_backend
+        self.logger = get_logger(level=log_level)
+        set_log_level(log_level)
 
     def annotate(self, file_path: str) -> DocumentAnnotation:
         """
@@ -55,16 +66,30 @@ class AnnotationService:
         Returns:
             DocumentAnnotation: 标注结果
         """
+        # 检测文件类型
+        from pathlib import Path
+        ext = Path(file_path).suffix.lower()
+        file_type = ext.lstrip('.')
+        
+        # 记录开始
+        start_time = time.time()
+        self.logger.file_start(file_path, file_type)
+        
         # 1. 构建Pipeline
         pipeline = self._build_pipeline()
 
         # 2. 执行
         result = pipeline.execute(file_path)
+        
+        # 计算耗时
+        duration_ms = (time.time() - start_time) * 1000
 
         # 3. 返回结果
         if not result.success:
+            self.logger.file_end(file_path, success=False, duration_ms=duration_ms)
             raise ValueError(f"Annotation failed: {result.errors}")
 
+        self.logger.file_end(file_path, success=True, duration_ms=duration_ms)
         return result.data
 
     def annotate_batch(self, file_paths: list[str]) -> list[DocumentAnnotation]:
@@ -96,8 +121,14 @@ class AnnotationService:
 
         流程：DocParser → ElementDetector → FeatureExtractor → LayoutClassifier
         """
+        # 根据配置选择解析器
+        parser = create_parser(
+            backend=self.parser_backend,
+            config=self.config.get("doc_parser", {})
+        )
+        
         return Pipeline() \
-            .add(DocParser(self.config.get("doc_parser", {}))) \
+            .add(parser) \
             .add(ElementDetector({
                 **self.config.get("element_detector", {}),
                 "ocr_model": self.ocr_model,

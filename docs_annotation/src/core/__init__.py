@@ -10,6 +10,7 @@ from .schema import (
     PDFProfile,
     DocumentAnnotation,
 )
+from .logger import AnnotationLogger, get_logger, set_log_level
 
 __all__ = [
     "BaseProcessor",
@@ -21,4 +22,7 @@ __all__ = [
     "ChartProfile",
     "PDFProfile",
     "DocumentAnnotation",
+    "AnnotationLogger",
+    "get_logger",
+    "set_log_level",
 ]

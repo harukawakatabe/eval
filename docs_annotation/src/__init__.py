@@ -26,10 +26,10 @@
 __version__ = "0.1.0"
 __author__ = "Your Name"
 
-from service import AnnotationService
-from core.schema import DocumentAnnotation, FileType, LayoutType
-from core.pipeline import Pipeline
-from core.base import BaseProcessor, ProcessResult
+from .service import AnnotationService
+from .core.schema import DocumentAnnotation, FileType, LayoutType
+from .core.pipeline import Pipeline
+from .core.base import BaseProcessor, ProcessResult
 
 __all__ = [
     "AnnotationService",

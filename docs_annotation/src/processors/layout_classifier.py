@@ -2,9 +2,10 @@
 
 from typing import Any, Dict, Optional
 
-from core.base import BaseProcessor, ProcessResult
-from core.schema import LayoutType, FileType
-from models.llm import LLMModel
+from ..core.base import BaseProcessor, ProcessResult
+from ..core.schema import LayoutType, FileType
+from ..core.logger import get_logger
+from ..models.llm import LLMModel
 from .doc_parser import DocContent
 from .element_detector import ElementList
 from .feature_extractor import FeatureSet
@@ -34,6 +35,7 @@ class LayoutClassifier(BaseProcessor):
         self.llm_model: Optional[LLMModel] = config.get("llm_model") if config else None
         self.use_llm = self.config.get("use_llm", True)
         self.fallback_rule = LayoutType(self.config.get("fallback_rule", "single"))
+        self.logger = get_logger()
 
     def process(self, input_data: tuple) -> ProcessResult:
         """
@@ -48,41 +50,62 @@ class LayoutClassifier(BaseProcessor):
         doc_content, elements, features = input_data
 
         is_pdf = doc_content.file_type == FileType.PDF
+        is_doc = doc_content.file_type == FileType.DOC
+        is_ppt = doc_content.file_type == FileType.PPT
 
         # 1. 布局分类
+        layout_reason = ""
         if is_pdf:
             # PDF：尝试使用 LLM 分类
             if self.use_llm and self.llm_model is not None:
                 layout = self._classify_with_llm(doc_content, elements, features)
+                layout_reason = "LLM分类"
             else:
                 layout = self._classify_by_rules(doc_content, elements, features)
+                layout_reason = "规则分类"
+        elif is_doc or is_ppt:
+            # DOC/PPT：根据特征判断
+            layout = self._classify_by_rules(doc_content, elements, features)
+            layout_reason = "规则分类"
         else:
-            # 非 PDF：默认 single
+            # 其他类型：默认 single
             layout = LayoutType.SINGLE
+            layout_reason = "默认值"
+
+        # 记录布局分类结果
+        self.logger.layout_classified(layout.value, layout_reason)
 
         # 2. 构建最终结果
-        from core.schema import DocumentAnnotation, DocProfile, TableProfile, ChartProfile
+        from ..core.schema import DocumentAnnotation, DocProfile, TableProfile, ChartProfile
 
         # 判断是否图文混排
         has_image = len(elements.images) > 0
         has_substantial_text = len(doc_content.text.strip()) > 100  # 文字超过100字符
         image_text_mixed = has_image and has_substantial_text
 
+        # 从 metadata 获取表格相关信息
+        metadata = doc_content.metadata or {}
+        has_table = len(elements.tables) > 0
+        has_image_table = metadata.get("has_image_table", False)
+        has_complex_table = metadata.get("has_complex_table", False)
+
         # 构建 DocProfile（适用于所有文档类型）
         doc_profile = DocProfile(
             layout=layout,
             has_image=has_image,
-            has_table=len(elements.tables) > 0,
+            has_table=has_table,
+            has_image_table=has_image_table,
+            has_complex_table=has_complex_table,
             has_formula=len(elements.formulas) > 0,
             has_chart=len(elements.charts) > 0,
             image_text_mixed=image_text_mixed,
         )
 
-        # 仅 PDF：添加可选字段
-        if is_pdf:
+        # PDF/DOC/PPT：添加表格特征
+        if is_pdf or is_doc or is_ppt:
             doc_profile.reading_order_sensitive = features.reading_order_sensitive
 
-            # 添加表格特征（仅 PDF）
+            # 添加表格特征
             if elements.tables:
                 doc_profile.table_profile = TableProfile(
                     long_table=features.long_table,
@@ -90,7 +113,7 @@ class LayoutClassifier(BaseProcessor):
                     table_dominant=features.table_dominant,
                 )
 
-            # 添加图表特征（仅 PDF）
+            # 添加图表特征
             if elements.charts:
                 doc_profile.chart_profile = ChartProfile(
                     cross_page_chart=features.cross_page_chart,

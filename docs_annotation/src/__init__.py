@@ -10,9 +10,9 @@
 - 可插拔的OCR和LLM模型接口
 
 使用示例:
-    from service import AnnotationService
-    from models.ocr import PaddleOCRModel
-    from models.llm import OpenAILLM
+    from docs_annotation.src.service import AnnotationService
+    from docs_annotation.src.models.ocr import PaddleOCRModel
+    from docs_annotation.src.models.llm import OpenAILLM
 
     service = AnnotationService(
         ocr_model=PaddleOCRModel(),
@@ -26,10 +26,10 @@
 __version__ = "0.1.0"
 __author__ = "Your Name"
 
-from .service import AnnotationService
-from .core.schema import DocumentAnnotation, FileType, LayoutType
-from .core.pipeline import Pipeline
-from .core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.core.schema import DocumentAnnotation, FileType, LayoutType
+from docs_annotation.src.core.pipeline import Pipeline
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
 
 __all__ = [
     "AnnotationService",

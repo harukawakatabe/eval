@@ -7,9 +7,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from ..core.base import BaseProcessor, ProcessResult
-from ..core.schema import DocumentAnnotation, FileType, EXT_TO_FILE_TYPE
-from ..core.logger import get_logger
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.core.schema import DocumentAnnotation, FileType, EXT_TO_FILE_TYPE
+from docs_annotation.src.core.logger import get_logger
 
 # 抑制 pdfminer 的字体警告
 logging.getLogger("pdfminer").setLevel(logging.ERROR)

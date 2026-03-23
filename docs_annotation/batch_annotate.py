@@ -29,11 +29,11 @@ from pathlib import Path
 from typing import List, Set, Dict, Any
 from datetime import datetime
 
-from src.service import AnnotationService
-from src.processors.doc_parser import ParserBackend
-from src.models.ocr import PaddleOCRModel, MockOCR
-from src.models.llm import OpenAILLM, MockLLM
-from src.core.logger import get_logger
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import PaddleOCRModel, MockOCR
+from docs_annotation.src.models.llm import OpenAILLM, MockLLM
+from docs_annotation.src.core.logger import get_logger
 
 
 # 支持的文件扩展名

@@ -3,11 +3,11 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from ..core.base import BaseProcessor, ProcessResult
-from ..core.logger import get_logger
-from ..models.llm import LLMModel
-from .doc_parser import DocContent
-from .element_detector import ElementList
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.core.logger import get_logger
+from docs_annotation.src.models.llm import LLMModel
+from docs_annotation.src.processors.doc_parser import DocContent
+from docs_annotation.src.processors.element_detector import ElementList
 
 
 @dataclass

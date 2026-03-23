@@ -8,7 +8,7 @@
 
 使用方法：
     python -m test.test_table_detection [file_path]
-    
+
 示例：
     python -m test.test_table_detection "reference/data/Files/业务交付管理/2-联想百应服务商收费标准.pdf"
     python -m test.test_table_detection "reference/data/Files/业务交付管理/5-联想百应《优选服务商红黄线管理规则》2025年第四版1001.pdf"
@@ -19,14 +19,10 @@ import logging
 import argparse
 from pathlib import Path
 
-# 添加正确的路径
-script_dir = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(script_dir))
-
-from service import AnnotationService
-from processors.doc_parser import ParserBackend
-from models.ocr import MockOCR
-from models.llm import MockLLM
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import MockOCR
+from docs_annotation.src.models.llm import MockLLM
 
 
 def test_file(file_path: str, parser_backend: ParserBackend = ParserBackend.LEGACY):

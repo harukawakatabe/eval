@@ -2,13 +2,13 @@
 
 from typing import Any, Dict, Optional
 
-from ..core.base import BaseProcessor, ProcessResult
-from ..core.schema import LayoutType, FileType
-from ..core.logger import get_logger
-from ..models.llm import LLMModel
-from .doc_parser import DocContent
-from .element_detector import ElementList
-from .feature_extractor import FeatureSet
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.core.schema import LayoutType, FileType
+from docs_annotation.src.core.logger import get_logger
+from docs_annotation.src.models.llm import LLMModel
+from docs_annotation.src.processors.doc_parser import DocContent
+from docs_annotation.src.processors.element_detector import ElementList
+from docs_annotation.src.processors.feature_extractor import FeatureSet
 
 
 class LayoutClassifier(BaseProcessor):

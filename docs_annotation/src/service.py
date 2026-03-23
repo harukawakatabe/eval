@@ -5,15 +5,15 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from .core.pipeline import Pipeline
-from .core.schema import DocumentAnnotation
-from .core.logger import get_logger, set_log_level
-from .processors.doc_parser import DocParser, ParserBackend, create_parser
-from .processors.element_detector import ElementDetector
-from .processors.feature_extractor import FeatureExtractor
-from .processors.layout_classifier import LayoutClassifier
-from .models.ocr import OCRModel
-from .models.llm import LLMModel
+from docs_annotation.src.core.pipeline import Pipeline
+from docs_annotation.src.core.schema import DocumentAnnotation
+from docs_annotation.src.core.logger import get_logger, set_log_level
+from docs_annotation.src.processors.doc_parser import DocParser, ParserBackend, create_parser
+from docs_annotation.src.processors.element_detector import ElementDetector
+from docs_annotation.src.processors.feature_extractor import FeatureExtractor
+from docs_annotation.src.processors.layout_classifier import LayoutClassifier
+from docs_annotation.src.models.ocr import OCRModel
+from docs_annotation.src.models.llm import LLMModel
 
 
 class AnnotationService:

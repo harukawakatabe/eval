@@ -3,10 +3,10 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from ..core.base import BaseProcessor, ProcessResult
-from ..core.logger import get_logger
-from ..models.ocr import OCRModel
-from .doc_parser import DocContent
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.core.logger import get_logger
+from docs_annotation.src.models.ocr import OCRModel
+from docs_annotation.src.processors.doc_parser import DocContent
 
 
 @dataclass

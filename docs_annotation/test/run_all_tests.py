@@ -3,7 +3,7 @@
 
 使用方法：
     python -m test.run_all_tests [test_data_dir]
-    
+
 示例：
     python -m test.run_all_tests "reference/data/Files/业务交付管理"
 """
@@ -15,14 +15,10 @@ import argparse
 from pathlib import Path
 from typing import List, Dict, Any
 
-# 添加正确的路径
-script_dir = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(script_dir))
-
-from service import AnnotationService
-from processors.doc_parser import ParserBackend
-from models.ocr import MockOCR
-from models.llm import MockLLM
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import MockOCR
+from docs_annotation.src.models.llm import MockLLM
 
 
 # 支持的文件扩展名

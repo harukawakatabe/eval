@@ -6,7 +6,7 @@
 使用方法：
     python -m test.test_parser_comparison <file_path>
     python -m test.test_parser_comparison <directory> --batch
-    
+
 示例：
     python -m test.test_parser_comparison document.pdf
     python -m test.test_parser_comparison "reference/data/Files/业务交付管理" --batch
@@ -20,14 +20,10 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List
 
-# 添加正确的路径
-script_dir = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(script_dir))
-
-from service import AnnotationService
-from processors.doc_parser import ParserBackend
-from models.ocr import MockOCR
-from models.llm import MockLLM
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import MockOCR
+from docs_annotation.src.models.llm import MockLLM
 
 
 # 支持的文件扩展名
@@ -68,7 +64,7 @@ def compare_file(file_path: str) -> Dict[str, Any]:
     
     # Docling 解析器（可能未安装）
     try:
-        from src.processors.docling_parser import DoclingParser
+        from docs_annotation.src.processors.docling_parser import DoclingParser
         parser = DoclingParser()
         if parser.is_available():
             print(f"  [Docling] 解析中...")

@@ -15,14 +15,10 @@ import logging
 import argparse
 from pathlib import Path
 
-# 添加正确的路径
-script_dir = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(script_dir))
-
-from src.service import AnnotationService
-from processors.doc_parser import ParserBackend
-from models.ocr import MockOCR
-from models.llm import MockLLM
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import MockOCR
+from docs_annotation.src.models.llm import MockLLM
 
 
 def test_file(file_path: str, parser_backend: ParserBackend = ParserBackend.LEGACY):

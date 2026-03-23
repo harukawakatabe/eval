@@ -3,7 +3,7 @@
 
 支持命令行参数：
     python test_one.py <file_path> [options]
-    
+
 选项：
     -v, --verbose      启用详细日志 (DEBUG级别)
     -q, --quiet        静默模式 (WARNING级别)
@@ -27,14 +27,10 @@ import argparse
 warnings.filterwarnings("ignore", message=".*FontBBox.*")
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
-# 将脚本所在目录添加到 Python 路径，确保能找到 src 包
-script_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, script_dir)
-
-from src.service import AnnotationService
-from src.processors.doc_parser import ParserBackend
-from src.models.ocr import MockOCR
-from src.models.llm import MockLLM
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.processors.doc_parser import ParserBackend
+from docs_annotation.src.models.ocr import MockOCR
+from docs_annotation.src.models.llm import MockLLM
 
 
 def parse_args():

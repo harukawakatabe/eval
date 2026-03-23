@@ -1,19 +1,15 @@
 """文档标注系统 - 使用示例。"""
 
-import sys
-import os
-
-# 添加src目录到路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
-
 # 加载环境变量
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
 from pathlib import Path
-from service import AnnotationService
-from models.ocr import PaddleOCRModel, MockOCR, TesseractOCRModel
-from models.llm import OpenAILLM, ClaudeLLM, MockLLM
+
+from docs_annotation.src.service import AnnotationService
+from docs_annotation.src.models.ocr import PaddleOCRModel, MockOCR, TesseractOCRModel
+from docs_annotation.src.models.llm import OpenAILLM, ClaudeLLM, MockLLM
 
 
 def main():
@@ -121,9 +117,9 @@ def main():
    export ANTHROPIC_API_KEY="your-key-here"
 
 3. 运行标注:
-   from service import AnnotationService
-   from models.ocr import PaddleOCRModel
-   from models.llm import OpenAILLM
+   from docs_annotation.src.service import AnnotationService
+   from docs_annotation.src.models.ocr import PaddleOCRModel
+   from docs_annotation.src.models.llm import OpenAILLM
 
    service = AnnotationService(
        ocr_model=PaddleOCRModel(),

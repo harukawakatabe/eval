@@ -4,10 +4,10 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from ..core.base import BaseProcessor, ProcessResult
-from ..core.schema import DocumentAnnotation, FileType, EXT_TO_FILE_TYPE
-from ..core.logger import get_logger
-from .doc_parser import DocContent
+from docs_annotation.src.core.base import BaseProcessor, ProcessResult
+from docs_annotation.src.core.schema import DocumentAnnotation, FileType, EXT_TO_FILE_TYPE
+from docs_annotation.src.core.logger import get_logger
+from docs_annotation.src.processors.doc_parser import DocContent
 
 # 抑制 Docling 内部日志
 logging.getLogger("docling").setLevel(logging.WARNING)

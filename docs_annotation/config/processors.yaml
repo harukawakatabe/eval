@@ -1,0 +1,84 @@
+# 处理器配置文件
+
+processors:
+  # 文档解析器配置
+  doc_parser:
+    # 支持的文件格式
+    supported_formats:
+      - pdf
+      - doc
+      - docx
+      - xls
+      - xlsx
+      - ppt
+      - pptx
+      - html
+      - htm
+      - txt
+      - md
+    # 是否提取页面图像（用于OCR）
+    extract_images: true
+
+  # 元素检测器配置
+  element_detector:
+    # 启用的检测器
+    enabled_detectors:
+      - image    # 图片检测
+      - table    # 表格检测
+      - formula  # 公式检测
+      - chart    # 图表检测
+    # 置信度阈值
+    confidence_threshold: 0.5
+
+  # 特征提取器配置
+  feature_extractor:
+    # 是否检查跨页元素
+    check_cross_page: true
+    # 是否检查长表格
+    check_long_table: true
+    # 长表格页数阈值
+    long_table_threshold: 3
+
+  # 布局分类器配置
+  layout_classifier:
+    # 是否使用LLM进行分类
+    use_llm: true
+    # LLM失败时的默认布局类型
+    fallback_rule: "single"
+
+# 模型配置
+models:
+  # OCR模型配置
+  ocr:
+    # 模型类型: paddleocr, tesseract, easyocr
+    type: "paddleocr"
+    # PaddleOCR配置
+    paddleocr:
+      lang: "ch"
+      use_angle_cls: true
+    # Tesseract配置
+    tesseract:
+      lang: "chi_sim+eng"
+
+  # LLM模型配置
+  llm:
+    # 模型类型: openai, claude, mock
+    type: "openai"
+    # OpenAI配置
+    openai:
+      model: "gpt-4"
+      api_key: "${OPENAI_API_KEY}"  # 支持环境变量
+      base_url: null
+    # Claude配置
+    claude:
+      model: "claude-3-5-sonnet-20241022"
+      api_key: "${ANTHROPIC_API_KEY}"
+
+# 输出配置
+output:
+  # 默认输出目录
+  directory: "output"
+  # 默认输出格式: json, yaml
+  format: "json"
+  # 是否输出详细信息
+  verbose: true
